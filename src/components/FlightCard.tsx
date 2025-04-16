@@ -8,10 +8,16 @@ interface FlightCardProps {
 
 const FlightCard: React.FC<FlightCardProps> = ({ flight, onSelect }) => {
   const formatTime = (time: string) => {
-    return new Date(time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    if (!time) return '--:--';
+    try {
+      return new Date(time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } catch {
+      return '--:--';
+    }
   };
 
-  const formatStops = (stops: number) => {
+  const formatStops = (stops: number | undefined) => {
+    if (stops === undefined) return 'Direct';
     if (stops === 0) return 'Direct';
     return `${stops} ${stops === 1 ? 'stop' : 'stops'}`;
   };
@@ -20,23 +26,11 @@ const FlightCard: React.FC<FlightCardProps> = ({ flight, onSelect }) => {
     <div className="flight-card">
       <div className="flight-card-header">
         <div className="airline-info">
-          <img 
-            src={`https://pics.avs.io/200/200/${flight.airlineCode}.png`} 
-            alt={flight.airline}
-            className="airline-logo"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = 'https://via.placeholder.com/200x200?text=Airline';
-            }}
-          />
-          <div className="airline-details">
-            <span className="airline-name">{flight.airline}</span>
-            <span className="flight-number">{flight.flightNumber}</span>
-          </div>
+          <span className="airline-name">{flight.airline || 'Unknown Airline'}</span>
         </div>
         <div className="flight-price">
           <span className="price-label">Price</span>
-          <span className="price-value">{flight.price}</span>
+          <span className="price-value">{flight.price || 'N/A'}</span>
         </div>
       </div>
 
@@ -44,16 +38,16 @@ const FlightCard: React.FC<FlightCardProps> = ({ flight, onSelect }) => {
         <div className="flight-time">
           <div className="time-block">
             <span className="time">{formatTime(flight.departureTime)}</span>
-            <span className="airport">{flight.origin}</span>
+            <span className="airport">{flight.origin || 'Unknown'}</span>
           </div>
           <div className="duration">
             <div className="duration-line"></div>
-            <span className="duration-text">{flight.duration}</span>
+            <span className="duration-text">{flight.duration || '--:--'}</span>
             <span className="stops-text">{formatStops(flight.stops)}</span>
           </div>
           <div className="time-block">
             <span className="time">{formatTime(flight.arrivalTime)}</span>
-            <span className="airport">{flight.destination}</span>
+            <span className="airport">{flight.destination || 'Unknown'}</span>
           </div>
         </div>
       </div>
