@@ -1,11 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/store';
-import { searchAirports, searchFlights, setAirport } from '../store/features/flightSlice';
+import { searchAirports, searchFlights, setAirport, FlightResult } from '../store/features/flightSlice';
 import { Airport } from '../store/features/flightSlice';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import './FlightSearch.css';
-import FlightMap from './FlightMap';
 import FlightCard from './FlightCard';
 
 const FlightSearch = () => {
@@ -109,26 +108,16 @@ const FlightSearch = () => {
     fetchFlights();
   }, [dispatch, airports.origin, airports.destination, formData.date]);
 
-  // Add this function to get coordinates from airport data
-  const getAirportCoordinates = (airport: any) => {
-    console.log('Airport data:', airport);
-    if (airport?.navigation?.coordinates) {
-      const coords = {
-        lat: airport.navigation.coordinates.latitude,
-        lng: airport.navigation.coordinates.longitude
-      };
-      console.log('Coordinates:', coords);
-      return coords;
-    }
-    console.log('No coordinates found, using default');
-    return { lat: 0, lng: 0 }; // Default coordinates if not available
-  };
-
+  
   // Add debugging for flight data
   useEffect(() => {
     console.log('Flight Data:', flightData);
     console.log('Airports:', airports);
   }, [flightData, airports]);
+
+  const handleFlightSelect = (flight: FlightResult) => {
+    console.log('Selected flight:', flight);
+  };
 
   return (
     <div className="flight-search-container">
@@ -279,7 +268,11 @@ const FlightSearch = () => {
             </div>
             <div className="flight-cards-container">
               {flightData.map((flight, index) => (
-                <FlightCard key={index} flight={flight} />
+                <FlightCard 
+                  key={`${flight.flightNumber}-${index}`} 
+                  flight={flight}
+                  onSelect={() => handleFlightSelect(flight)}
+                />
               ))}
             </div>
           </div>
